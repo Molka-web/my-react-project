@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 
 const courseTitle = "Web Development 2"
+const API_BASE_URL = 'https://hn.algolia.com/api/v1/search?query='
 
-// ========== WEEK 8 COMPONENTS ==========
+// ========== WEEK 8-9 COMPONENTS ==========
 
 const Header = () => {
   return (
@@ -45,7 +46,6 @@ const Item = ({ story, onRemoveItem }) => {
 }
 
 const List = ({ stories, onRemoveItem }) => {
-  console.log("List rendered")
   return (
     <div>
       <h2>Top Stories</h2>
@@ -57,63 +57,65 @@ const List = ({ stories, onRemoveItem }) => {
 }
 
 const App = () => {
-  console.log("App rendered")
-  
-  // Initialize searchTerm from localStorage
-  const getInitialSearchTerm = () => {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [url, setUrl] = useState('')
+  const [stories, setStories] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isError, setIsError] = useState(false)
+
+  // Load saved search from localStorage
+  useEffect(() => {
     const savedSearch = localStorage.getItem('search')
-    return savedSearch || ''
-  }
-  
-  const [searchTerm, setSearchTerm] = useState(getInitialSearchTerm)
-  
-  // Save to localStorage whenever searchTerm changes
+    if (savedSearch) {
+      setSearchTerm(savedSearch)
+    }
+  }, [])
+
+  // Save searchTerm to localStorage
   useEffect(() => {
     localStorage.setItem('search', searchTerm)
-    console.log('Saved to localStorage:', searchTerm)
   }, [searchTerm])
-  
-  const initialStories = [
-    {
-      objectID: 1,
-      title: "React 19 Released with New Features",
-      url: "https://react.dev/blog/2024/react-19",
-      author: "react_team",
-      points: 500,
-      num_comments: 89
-    },
-    {
-      objectID: 2,
-      title: "Understanding useEffect Hook",
-      url: "https://example.com/useEffect-guide",
-      author: "dev_learner",
-      points: 127,
-      num_comments: 34
-    },
-    {
-      objectID: 3,
-      title: "Why Vite is Faster Than Create React App",
-      url: "https://vitejs.dev/guide/why.html",
-      author: "vite_team",
-      points: 256,
-      num_comments: 67
-    }
-  ]
 
-  const [stories, setStories] = useState(initialStories)
+  // Fetch stories when URL changes
+  useEffect(() => {
+    if (!url) return
+
+    const fetchStories = async () => {
+      setIsLoading(true)
+      setIsError(false)
+      
+      try {
+        const response = await fetch(url)
+        if (!response.ok) {
+          throw new Error('Failed to fetch')
+        }
+        const data = await response.json()
+        setStories(data.hits || [])
+      } catch (error) {
+        setIsError(true)
+        console.error('Fetch error:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchStories()
+  }, [url])
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value)
+  }
+
+  const handleSubmit = () => {
+    if (searchTerm.trim()) {
+      setUrl(`${API_BASE_URL}${searchTerm}`)
+    }
   }
 
   const handleRemoveStory = (objectID) => {
     const newStories = stories.filter((story) => story.objectID !== objectID)
     setStories(newStories)
   }
-
-  const filteredStories = stories.filter((story) => {
-    return story.title.toLowerCase().includes(searchTerm.toLowerCase())
-  })
 
   const studentName = "Molka"
 
@@ -143,6 +145,13 @@ const App = () => {
       >
         <strong>Search:</strong>
       </InputWithLabel>
+      <button 
+        type="button" 
+        onClick={handleSubmit}
+        disabled={!searchTerm.trim()}
+      >
+        Submit
+      </button>
 
       <p>Name: {student.name}</p>
       <p>Age: {student.age}</p>
@@ -150,19 +159,21 @@ const App = () => {
 
       <p>{sayHello()}</p>
 
-      <List stories={filteredStories} onRemoveItem={handleRemoveStory} />
+      {isLoading && <p>Loading stories...</p>}
+      {isError && <p>Something went wrong. Please try again.</p>}
+      {!isLoading && !isError && <List stories={stories} onRemoveItem={handleRemoveStory} />}
     </div>
   )
 }
 
 export default App
 
-// ========== WEEK 8 REFLECTION ==========
-// What makes a component reusable?
-//    Generic props (not domain-specific like "searchTerm"), no hard-coded values
+// ========== WEEK 9 REFLECTION ==========
+// Why use useEffect for fetching?
+//    Because fetching is a side effect that should happen after render
 //
-// What is component composition?
-//    Using children prop to pass JSX content into a component
+// What is the difference between loading and error state?
+//    Loading shows during fetch, error shows when fetch fails
 //
-// Why do we pass handlers down the component tree?
-//    To keep state in the parent component while allowing child components to trigger updates
+// Why control when fetching happens?
+//    To avoid unnecessary API calls and rate limiting
