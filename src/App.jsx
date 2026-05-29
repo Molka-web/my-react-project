@@ -39,35 +39,29 @@ const stories = [
 
 const courseTitle = "Web Development 2"
 
-function App() {
-  const studentName = "Molka"
+// ========== WEEK 4 NEW COMPONENTS ==========
 
-  const student = {
-    name: "Molka",
-    age: 22,
-    track: "Computer Science"
-  }
+function Header() {
+  return (
+    <header>
+      <h1>Hacker News Reader</h1>
+      <p>Top tech stories from the community</p>
+    </header>
+  )
+}
 
-  function sayHello() {
-    return `Hello ${studentName}! Welcome to ${courseTitle}`
-  }
-
+function Search() {
   return (
     <div>
-      <h1>My React Learning Journey</h1>
-      <p>Student: {studentName}</p>
-      <p>Course: {courseTitle}</p>
-      <p>Welcome to {courseTitle}, {studentName}!</p>
-
       <label htmlFor="studentInput">Enter your name:</label>
       <input type="text" id="studentInput" />
+    </div>
+  )
+}
 
-      <p>Name: {student.name}</p>
-      <p>Age: {student.age}</p>
-      <p>Track: {student.track}</p>
-
-      <p>{sayHello()}</p>
-
+function List() {
+  return (
+    <div>
       <h2>Top Stories</h2>
       {stories.map(function(story) {
         return (
@@ -85,12 +79,62 @@ function App() {
   )
 }
 
+function App() {
+  const studentName = "Molka"
+
+  const student = {
+    name: "Molka",
+    age: 22,
+    track: "Computer Science"
+  }
+
+  function sayHello() {
+    return `Hello ${studentName}! Welcome to ${courseTitle}`
+  }
+
+  return (
+    <div>
+      <Header />
+      
+      <h1>My React Learning Journey</h1>
+      <p>Student: {studentName}</p>
+      <p>Course: {courseTitle}</p>
+      <p>Welcome to {courseTitle}, {studentName}!</p>
+
+      <Search />
+
+      <p>Name: {student.name}</p>
+      <p>Age: {student.age}</p>
+      <p>Track: {student.track}</p>
+
+      <p>{sayHello()}</p>
+
+      <List />
+    </div>
+  )
+}
+
 export default App
 
 // ========== WEEK 3 REFLECTION ==========
 // 1. Why is map() essential for rendering lists in React?
 //    Because it transforms an array into an array of JSX elements automatically.
+//
 // 2. Why is objectID the correct key?
 //    Because it's unique and stable across renders
+//
 // 3. What will change when we replace fake data with the Hacker News API?
 //    We'll use fetch() or axios to get real data, and the data will come from the internet
+
+// ========== WEEK 4 REFLECTION ==========
+// What does App do now?
+//    App is the main container that arranges all components (Header, Search, List)
+//
+// What does List do?
+//    List is responsible ONLY for rendering the stories array
+//
+// What does Search do?
+//    Search is responsible ONLY for rendering the input field
+//
+// Why is this structure cleaner than before?
+//    Each component has one job, easier to debug, easier to reuse
