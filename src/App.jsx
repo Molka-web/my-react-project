@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const courseTitle = "Web Development 2"
 
-// ========== WEEK 6 COMPONENTS ==========
+// ========== WEEK 7 COMPONENTS ==========
 
 const Header = () => {
   return (
@@ -13,7 +13,7 @@ const Header = () => {
   )
 }
 
-const Search = (props) => {
+const Search = ({ searchTerm, onSearch }) => {
   console.log("Search rendered")
   return (
     <div>
@@ -21,32 +21,33 @@ const Search = (props) => {
       <input 
         type="text" 
         id="searchInput" 
-        onChange={props.onSearch}
+        value={searchTerm}
+        onChange={onSearch}
         placeholder="Search by title..."
       />
     </div>
   )
 }
 
-const Item = (props) => {
+const Item = ({ story }) => {
   return (
     <div>
       <h3>
-        <a href={props.story.url} target="_blank" rel="noopener noreferrer">
-          {props.story.title}
+        <a href={story.url} target="_blank" rel="noopener noreferrer">
+          {story.title}
         </a>
       </h3>
-      <p>By: {props.story.author} | ⭐ {props.story.points} points | 💬 {props.story.num_comments} comments</p>
+      <p>By: {story.author} | ⭐ {story.points} points | 💬 {story.num_comments} comments</p>
     </div>
   )
 }
 
-const List = (props) => {
+const List = ({ stories }) => {
   console.log("List rendered")
   return (
     <div>
       <h2>Top Stories</h2>
-      {props.stories.map((story) => (
+      {stories.map((story) => (
         <Item key={story.objectID} story={story} />
       ))}
     </div>
@@ -56,7 +57,19 @@ const List = (props) => {
 const App = () => {
   console.log("App rendered")
   
-  const [searchTerm, setSearchTerm] = useState('')
+  // Initialize searchTerm from localStorage
+  const getInitialSearchTerm = () => {
+    const savedSearch = localStorage.getItem('search')
+    return savedSearch || ''
+  }
+  
+  const [searchTerm, setSearchTerm] = useState(getInitialSearchTerm)
+  
+  // Save to localStorage whenever searchTerm changes
+  useEffect(() => {
+    localStorage.setItem('search', searchTerm)
+    console.log('Saved to localStorage:', searchTerm)
+  }, [searchTerm])
   
   const stories = [
     {
@@ -114,7 +127,7 @@ const App = () => {
       <p>Course: {courseTitle}</p>
       <p>Welcome to {courseTitle}, {studentName}!</p>
 
-      <Search onSearch={handleSearch} />
+      <Search searchTerm={searchTerm} onSearch={handleSearch} />
 
       <p>Name: {student.name}</p>
       <p>Age: {student.age}</p>
@@ -129,13 +142,12 @@ const App = () => {
 
 export default App
 
-// ========== WEEK 6 REFLECTION ==========
-// What is the difference between props and state?
-//    Props are passed from parent to child (read-only)
-//    State is internal to a component (can be updated)
+// ========== WEEK 7 REFLECTION ==========
+// What is a controlled component?
+//    A component where React controls the input value via state
 //
-// Why do we lift state up?
-//    To share state between multiple components that need it
+// What is a side effect in React?
+//    Operations that interact with the outside world (localStorage, API calls)
 //
-// Where should filtering logic live?
-//    In the component that owns the data (App component)
+// Why do we use useEffect instead of calling code directly?
+//    To avoid running side effects on every render unnecessarily
