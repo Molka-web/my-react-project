@@ -1,15 +1,4 @@
-// =========== WEEK 3 LAB: HACKER NEWS STORIES ===========
-// Data structure for each story:
-// - title: article title
-// - url: link to article
-// - author: who posted it
-// - objectID: unique identifier (used as React key)
-// - points: popularity score
-// - num_comments: number of comments
-
-// Which property should be used as the React key? objectID because it's unique
-// Why is this structure realistic for an API? Real APIs return arrays of objects.
-
+// =========== WEEK 3 LAB: HACKER NEWS STORIES ==========
 const stories = [
   {
     objectID: 1,
@@ -39,9 +28,9 @@ const stories = [
 
 const courseTitle = "Web Development 2"
 
-// ========== WEEK 4 NEW COMPONENTS ==========
+// ========== WEEK 5: ARROW FUNCTIONS ==========
 
-function Header() {
+const Header = () => {
   return (
     <header>
       <h1>Hacker News Reader</h1>
@@ -50,36 +39,39 @@ function Header() {
   )
 }
 
-function Search() {
+const Search = () => {
+  const handleInput = (event) => {
+    console.log("User is typing...")
+    console.log("Current value:", event.target.value)
+  }
+
   return (
     <div>
       <label htmlFor="studentInput">Enter your name:</label>
-      <input type="text" id="studentInput" />
+      <input type="text" id="studentInput" onChange={handleInput} />
     </div>
   )
 }
 
-function List() {
+const List = () => {
   return (
     <div>
       <h2>Top Stories</h2>
-      {stories.map(function(story) {
-        return (
-          <div key={story.objectID}>
-            <h3>
-              <a href={story.url} target="_blank" rel="noopener noreferrer">
-                {story.title}
-              </a>
-            </h3>
-            <p>By: {story.author} | ⭐ {story.points} points | 💬 {story.num_comments} comments</p>
-          </div>
-        )
-      })}
+      {stories.map((story) => (
+        <div key={story.objectID}>
+          <h3>
+            <a href={story.url} target="_blank" rel="noopener noreferrer">
+              {story.title}
+            </a>
+          </h3>
+          <p>By: {story.author} | ⭐ {story.points} points | 💬 {story.num_comments} comments</p>
+        </div>
+      ))}
     </div>
   )
 }
 
-function App() {
+const App = () => {
   const studentName = "Molka"
 
   const student = {
@@ -88,7 +80,7 @@ function App() {
     track: "Computer Science"
   }
 
-  function sayHello() {
+  const sayHello = () => {
     return `Hello ${studentName}! Welcome to ${courseTitle}`
   }
 
@@ -116,25 +108,12 @@ function App() {
 
 export default App
 
-// ========== WEEK 3 REFLECTION ==========
-// 1. Why is map() essential for rendering lists in React?
-//    Because it transforms an array into an array of JSX elements automatically.
+// ========== WEEK 5 REFLECTION ==========
+// When do we use concise body arrow functions?
+//    When the function only returns a single expression
 //
-// 2. Why is objectID the correct key?
-//    Because it's unique and stable across renders
+// When do we use block body arrow functions?
+//    When we need multiple statements or logic
 //
-// 3. What will change when we replace fake data with the Hacker News API?
-//    We'll use fetch() or axios to get real data, and the data will come from the internet
-
-// ========== WEEK 4 REFLECTION ==========
-// What does App do now?
-//    App is the main container that arranges all components (Header, Search, List)
-//
-// What does List do?
-//    List is responsible ONLY for rendering the stories array
-//
-// What does Search do?
-//    Search is responsible ONLY for rendering the input field
-//
-// Why is this structure cleaner than before?
-//    Each component has one job, easier to debug, easier to reuse
+// What does an event object contain?
+//    Information about the event including target.value
