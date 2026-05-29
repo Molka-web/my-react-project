@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 const courseTitle = "Web Development 2"
 
-// ========== WEEK 7 COMPONENTS ==========
+// ========== WEEK 8 COMPONENTS ==========
 
 const Header = () => {
   return (
@@ -13,23 +13,22 @@ const Header = () => {
   )
 }
 
-const Search = ({ searchTerm, onSearch }) => {
-  console.log("Search rendered")
+const InputWithLabel = ({ id, type = "text", value, onInputChange, children }) => {
   return (
-    <div>
-      <label htmlFor="searchInput">Search stories:</label>
-      <input 
-        type="text" 
-        id="searchInput" 
-        value={searchTerm}
-        onChange={onSearch}
-        placeholder="Search by title..."
+    <>
+      <label htmlFor={id}>{children}</label>
+      &nbsp;
+      <input
+        id={id}
+        type={type}
+        value={value}
+        onChange={onInputChange}
       />
-    </div>
+    </>
   )
 }
 
-const Item = ({ story }) => {
+const Item = ({ story, onRemoveItem }) => {
   return (
     <div>
       <h3>
@@ -38,17 +37,20 @@ const Item = ({ story }) => {
         </a>
       </h3>
       <p>By: {story.author} | ⭐ {story.points} points | 💬 {story.num_comments} comments</p>
+      <button type="button" onClick={() => onRemoveItem(story.objectID)}>
+        Dismiss
+      </button>
     </div>
   )
 }
 
-const List = ({ stories }) => {
+const List = ({ stories, onRemoveItem }) => {
   console.log("List rendered")
   return (
     <div>
       <h2>Top Stories</h2>
       {stories.map((story) => (
-        <Item key={story.objectID} story={story} />
+        <Item key={story.objectID} story={story} onRemoveItem={onRemoveItem} />
       ))}
     </div>
   )
@@ -71,7 +73,7 @@ const App = () => {
     console.log('Saved to localStorage:', searchTerm)
   }, [searchTerm])
   
-  const stories = [
+  const initialStories = [
     {
       objectID: 1,
       title: "React 19 Released with New Features",
@@ -98,8 +100,15 @@ const App = () => {
     }
   ]
 
+  const [stories, setStories] = useState(initialStories)
+
   const handleSearch = (event) => {
     setSearchTerm(event.target.value)
+  }
+
+  const handleRemoveStory = (objectID) => {
+    const newStories = stories.filter((story) => story.objectID !== objectID)
+    setStories(newStories)
   }
 
   const filteredStories = stories.filter((story) => {
@@ -127,7 +136,13 @@ const App = () => {
       <p>Course: {courseTitle}</p>
       <p>Welcome to {courseTitle}, {studentName}!</p>
 
-      <Search searchTerm={searchTerm} onSearch={handleSearch} />
+      <InputWithLabel
+        id="search"
+        value={searchTerm}
+        onInputChange={handleSearch}
+      >
+        <strong>Search:</strong>
+      </InputWithLabel>
 
       <p>Name: {student.name}</p>
       <p>Age: {student.age}</p>
@@ -135,19 +150,19 @@ const App = () => {
 
       <p>{sayHello()}</p>
 
-      <List stories={filteredStories} />
+      <List stories={filteredStories} onRemoveItem={handleRemoveStory} />
     </div>
   )
 }
 
 export default App
 
-// ========== WEEK 7 REFLECTION ==========
-// What is a controlled component?
-//    A component where React controls the input value via state
+// ========== WEEK 8 REFLECTION ==========
+// What makes a component reusable?
+//    Generic props (not domain-specific like "searchTerm"), no hard-coded values
 //
-// What is a side effect in React?
-//    Operations that interact with the outside world (localStorage, API calls)
+// What is component composition?
+//    Using children prop to pass JSX content into a component
 //
-// Why do we use useEffect instead of calling code directly?
-//    To avoid running side effects on every render unnecessarily
+// Why do we pass handlers down the component tree?
+//    To keep state in the parent component while allowing child components to trigger updates
