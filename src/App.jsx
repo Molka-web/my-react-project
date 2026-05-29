@@ -1,34 +1,8 @@
-// =========== WEEK 3 LAB: HACKER NEWS STORIES ==========
-const stories = [
-  {
-    objectID: 1,
-    title: "React 19 Released with New Features",
-    url: "https://react.dev/blog/2024/react-19",
-    author: "react_team",
-    points: 500,
-    num_comments: 89
-  },
-  {
-    objectID: 2,
-    title: "Understanding useEffect Hook",
-    url: "https://example.com/useEffect-guide",
-    author: "dev_learner",
-    points: 127,
-    num_comments: 34
-  },
-  {
-    objectID: 3,
-    title: "Why Vite is Faster Than Create React App",
-    url: "https://vitejs.dev/guide/why.html",
-    author: "vite_team",
-    points: 256,
-    num_comments: 67
-  }
-]
+import { useState } from 'react'
 
 const courseTitle = "Web Development 2"
 
-// ========== WEEK 5: ARROW FUNCTIONS ==========
+// ========== WEEK 6 COMPONENTS ==========
 
 const Header = () => {
   return (
@@ -39,39 +13,86 @@ const Header = () => {
   )
 }
 
-const Search = () => {
-  const handleInput = (event) => {
-    console.log("User is typing...")
-    console.log("Current value:", event.target.value)
-  }
-
+const Search = (props) => {
+  console.log("Search rendered")
   return (
     <div>
-      <label htmlFor="studentInput">Enter your name:</label>
-      <input type="text" id="studentInput" onChange={handleInput} />
+      <label htmlFor="searchInput">Search stories:</label>
+      <input 
+        type="text" 
+        id="searchInput" 
+        onChange={props.onSearch}
+        placeholder="Search by title..."
+      />
     </div>
   )
 }
 
-const List = () => {
+const Item = (props) => {
+  return (
+    <div>
+      <h3>
+        <a href={props.story.url} target="_blank" rel="noopener noreferrer">
+          {props.story.title}
+        </a>
+      </h3>
+      <p>By: {props.story.author} | ⭐ {props.story.points} points | 💬 {props.story.num_comments} comments</p>
+    </div>
+  )
+}
+
+const List = (props) => {
+  console.log("List rendered")
   return (
     <div>
       <h2>Top Stories</h2>
-      {stories.map((story) => (
-        <div key={story.objectID}>
-          <h3>
-            <a href={story.url} target="_blank" rel="noopener noreferrer">
-              {story.title}
-            </a>
-          </h3>
-          <p>By: {story.author} | ⭐ {story.points} points | 💬 {story.num_comments} comments</p>
-        </div>
+      {props.stories.map((story) => (
+        <Item key={story.objectID} story={story} />
       ))}
     </div>
   )
 }
 
 const App = () => {
+  console.log("App rendered")
+  
+  const [searchTerm, setSearchTerm] = useState('')
+  
+  const stories = [
+    {
+      objectID: 1,
+      title: "React 19 Released with New Features",
+      url: "https://react.dev/blog/2024/react-19",
+      author: "react_team",
+      points: 500,
+      num_comments: 89
+    },
+    {
+      objectID: 2,
+      title: "Understanding useEffect Hook",
+      url: "https://example.com/useEffect-guide",
+      author: "dev_learner",
+      points: 127,
+      num_comments: 34
+    },
+    {
+      objectID: 3,
+      title: "Why Vite is Faster Than Create React App",
+      url: "https://vitejs.dev/guide/why.html",
+      author: "vite_team",
+      points: 256,
+      num_comments: 67
+    }
+  ]
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value)
+  }
+
+  const filteredStories = stories.filter((story) => {
+    return story.title.toLowerCase().includes(searchTerm.toLowerCase())
+  })
+
   const studentName = "Molka"
 
   const student = {
@@ -93,7 +114,7 @@ const App = () => {
       <p>Course: {courseTitle}</p>
       <p>Welcome to {courseTitle}, {studentName}!</p>
 
-      <Search />
+      <Search onSearch={handleSearch} />
 
       <p>Name: {student.name}</p>
       <p>Age: {student.age}</p>
@@ -101,19 +122,20 @@ const App = () => {
 
       <p>{sayHello()}</p>
 
-      <List />
+      <List stories={filteredStories} />
     </div>
   )
 }
 
 export default App
 
-// ========== WEEK 5 REFLECTION ==========
-// When do we use concise body arrow functions?
-//    When the function only returns a single expression
+// ========== WEEK 6 REFLECTION ==========
+// What is the difference between props and state?
+//    Props are passed from parent to child (read-only)
+//    State is internal to a component (can be updated)
 //
-// When do we use block body arrow functions?
-//    When we need multiple statements or logic
+// Why do we lift state up?
+//    To share state between multiple components that need it
 //
-// What does an event object contain?
-//    Information about the event including target.value
+// Where should filtering logic live?
+//    In the component that owns the data (App component)
